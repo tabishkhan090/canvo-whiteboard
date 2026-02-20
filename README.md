@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Turborepo starter
 
 This Turborepo starter is maintained by the Turborepo core team.
@@ -138,3 +139,7 @@ Learn more about the power of Turborepo:
 # canvo-whiteboard
 Canvo Whiteboard is a modern, real-time collaborative whiteboard for seamless drawing and idea sharing. Built with Next.js, Node.js, TypeScript, WebSockets, TailwindCSS, and PostgreSQL for a fast and scalable experience.
 >>>>>>> 44d8f3ef6828031656cba5d6f16acab768015426
+=======
+# canvo-whiteboard
+Canvo Whiteboard is a modern, real-time collaborative whiteboard for seamless drawing and idea sharing. Built with Next.js, Node.js, TypeScript, WebSockets, TailwindCSS, and PostgreSQL for a fast and scalable experience.
+>>>>>>> 2f6f93e7de04e4aacc46d6e0a1c418ad8865fcac
