@@ -31,9 +31,9 @@ export const Middleware = (
             message: "Unauthorized",
         });
         }
-
+        // @ts-ignore
         // Attach userId to request
-        (req as any).userId = decoded.userId;
+        req.userId = decoded.userId;
 
         next();
     } catch (err) {
