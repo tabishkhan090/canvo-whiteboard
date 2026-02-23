@@ -12,18 +12,29 @@ app.use(express.json());
 app.post("/signup", async (req, res) =>{
     const parsedData = CreateUserSchema.safeParse(req.body);
     if(!parsedData.success){
-        return res.status(403).json({
+        return res.status(400).json({
             success: false,
             message: "Invalid Inputs"
         })
     }
     try{
+        const existingUser = await prisma.user.findUnique({
+            where: { email: parsedData.data.username }
+        });
+
+        if (existingUser) {
+            return res.status(409).json({
+                success: false,
+                message: "User already exists"
+            });
+        }
+
         const hashPass = await bcrypt.hash(parsedData.data.password, 10);
         const user = await prisma.user.create({
             data: {
-                email: parsedData.data?.username,
+                email: parsedData.data.username,
                 password: hashPass,
-                name: parsedData.data?.name,
+                name: parsedData.data.name,
             }
         })
         return res.json({
@@ -31,6 +42,7 @@ app.post("/signup", async (req, res) =>{
             userId: user.id
         })
     }catch(err){
+        console.error(err);
         return res.status(500).json({
             success: false,
             message: "Something went wrong"
