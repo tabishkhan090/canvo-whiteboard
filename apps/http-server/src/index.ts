@@ -100,12 +100,23 @@ app.post("/signin", async (req, res) => {
 app.post("/room", Middleware, async (req, res) =>{
     const parsedData = CreateRoomSchema.safeParse(req.body);
     if(!parsedData.success){
-        return res.status(403).json({
+        return res.status(400).json({
             success: false,
             message: "Invalid Inputs"
         });
     }
     try{
+        const existingUser = await prisma.room.findUnique({
+            where: {
+                slug: parsedData.data.name
+            }
+        })
+        if(existingUser){
+            return res.status(409).json({
+                success: false,
+                message: "Room already exist"
+            })
+        }
         // @ts-ignore
         const userId = req.userId;
         const room = await prisma.room.create({
@@ -120,6 +131,32 @@ app.post("/room", Middleware, async (req, res) =>{
     })
 
     }catch(err){
+        console.log(err);
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong"
+        })
+    }
+})
+
+app.get("/chats/:roomId", Middleware, async (req, res) =>{
+    const roomId = Number(req.params.roomId);
+    try{
+        const chats = await prisma.chat.findMany({
+        where: {
+            roomId
+        },
+        orderBy: {
+            id: "desc"
+        },
+        take: 1000
+        })
+        res.json({
+            success: true,
+            chats
+        })
+    }catch(err){
+        console.log(err);
         return res.status(500).json({
             success: false,
             message: "Something went wrong"
