@@ -47,10 +47,13 @@ wss.on('connection', function connection(ws, Request) {
     
     ws.on('message', async function message(data){
         let parsedData;
-        if(typeof data != "string")
-            parsedData = JSON.parse(data.toString());
-        else
-            parsedData = JSON.parse(data);
+        try {
+            const raw = typeof data === "string" ? data : data.toString();
+            parsedData = JSON.parse(raw);
+        } catch (e) {
+            console.error("Invalid JSON received:", e);
+            return;
+        }
         console.log(parsedData);
         
         if(parsedData.type ==="join_room"){
@@ -71,7 +74,7 @@ wss.on('connection', function connection(ws, Request) {
             const message = parsedData.message;
             await prisma.chat.create({
                 data: {
-                    roomId: roomId,
+                    roomId: Number(roomId),
                     message,
                     userId
                 }
