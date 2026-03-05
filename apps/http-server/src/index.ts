@@ -2,10 +2,10 @@ import { JWT_SECRET } from "@repo/backend-common/config"
 import { CreateUserSchema, SigninSchema, CreateRoomSchema } from "@repo/common/types"
 import express from "express"
 import { Middleware } from "./middleware";
-import { prisma } from "@repo/db/prisma"
+import { prisma } from "@repo/db"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
-
+import dotenv from "dotenv";
 const app = express();
 app.use(express.json());
 
@@ -19,7 +19,7 @@ app.post("/signup", async (req, res) =>{
     }
     try{
         const existingUser = await prisma.user.findUnique({
-            where: { email: parsedData.data.username }
+            where: { email: parsedData.data.email }
         });
 
         if (existingUser) {
@@ -32,7 +32,7 @@ app.post("/signup", async (req, res) =>{
         const hashPass = await bcrypt.hash(parsedData.data.password, 10);
         const user = await prisma.user.create({
             data: {
-                email: parsedData.data.username,
+                email: parsedData.data.email,
                 password: hashPass,
                 name: parsedData.data.name,
             }
@@ -98,6 +98,7 @@ app.post("/signin", async (req, res) => {
 });
 
 app.post("/room", Middleware, async (req, res) =>{
+    console.log("authHeader");
     const parsedData = CreateRoomSchema.safeParse(req.body);
     if(!parsedData.success){
         return res.status(400).json({
@@ -154,6 +155,27 @@ app.get("/chats/:roomId", Middleware, async (req, res) =>{
         res.json({
             success: true,
             chats
+        })
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong"
+        })
+    }
+})
+
+    app.get("/room/:slug", Middleware, async (req, res) =>{
+    const slug = req.params.slug?.toString();
+    try{
+        const roomid = await prisma.room.findFirst({
+        where: {
+            slug
+        }
+        })
+        res.json({
+            success: true,
+            roomid
         })
     }catch(err){
         console.log(err);

@@ -8,22 +8,22 @@ export const Middleware = (
     next: NextFunction
     ) => {
     try {
-        const authHeader = req.headers["authorization"];
-
-        if (!authHeader) {
-        return res.status(403).json({
-            message: "Unauthorized",
-        });
-        }
-
-        // Extract token from "Bearer <token>"
-        const token = authHeader.split(" ")[1];
-
+        const token = req.headers["authorization"];
         if (!token) {
-        return res.status(403).json({
-            message: "Unauthorized",
-        });
+            return res.status(403).json({
+                message: "Unauthorized",
+            });
         }
+        
+        // // Extract token from "Bearer <token>"
+        // const token = token.split(" ")[1];
+        
+        // if (!token) {
+        //     console.log(token);
+        // return res.status(403).json({
+        //     message: "Unauthorized",
+        // });
+        // }
         const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
         if (!decoded || !decoded.userId) {

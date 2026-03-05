@@ -1,9 +1,11 @@
 import { JWT_SECRET } from "@repo/backend-common/config"
 import jwt from "jsonwebtoken"
 import {WebSocket, WebSocketServer} from "ws"
-import { prisma } from "@repo/db/prisma"
-
-const wss = new WebSocketServer({port: 8080});
+import { prisma } from "@repo/db";
+// const JWT_SECRET = "ewrcwectrewtrevtw"
+const wss = new WebSocketServer({port: 8080},()=>{
+    console.log("port is running on: 8080")
+});
 
 interface User {
     ws: WebSocket,
@@ -30,37 +32,40 @@ wss.on('connection', function connection(ws, Request) {
     }
     const queryParams = new URLSearchParams(Request.url.split('?')[1]);
     const token = queryParams.get('token') || "";
-
+    console.log(token);
     const userId = checkUser(token);
     if (!userId) {
         ws.close();
         return;
     }
-
+    
     users.push({
         ws,
         rooms: [],
         userId
     })
+    
     ws.on('message', async function message(data){
         let parsedData;
         if(typeof data != "string")
             parsedData = JSON.parse(data.toString());
         else
             parsedData = JSON.parse(data);
-
+        console.log(parsedData);
+        
         if(parsedData.type ==="join_room"){
             const user = users.find(x => x.ws===ws);
             user?.rooms.push(parsedData.roomId);
         }
-
+        
         if(parsedData.type ==="leave_room"){
             const user = users.find(x => x.ws===ws);
             if(!user)  
                 return
             user?.rooms.filter(parsedData.roomId);
         }
-
+        
+        console.log(users);
         if(parsedData.type ==="chat"){
             const roomId = parsedData.roomId;
             const message = parsedData.message;
