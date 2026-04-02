@@ -1,11 +1,11 @@
 import { JWT_SECRET } from "@repo/backend-common/config"
 import { CreateUserSchema, SigninSchema, CreateRoomSchema } from "@repo/common/types"
 import express from "express"
-import { Middleware } from "./middleware";
+import { Middleware } from "./middleware"
 import { prisma } from "@repo/db"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
-import dotenv from "dotenv";
+import dotenv from "dotenv"
 import cors from "cors"
 
 const app = express();
@@ -121,8 +121,8 @@ app.post("/room", Middleware, async (req, res) =>{
                 message: "Room already exist"
             })
         }
-        // @ts-ignore
-        const userId = req.userId;
+        
+        const userId = req.userId!; // ! -> “I guarantee it’s not undefined”
         console.log(userId);
         const room = await prisma.room.create({
         data: {

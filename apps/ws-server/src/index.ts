@@ -14,6 +14,7 @@ interface User {
 }
 const users: User[] = [];
 
+
 function checkUser(token: string): string | null {
     const result = jwt.verify(token,JWT_SECRET);
     if(typeof result == "string"){

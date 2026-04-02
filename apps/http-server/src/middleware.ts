@@ -6,39 +6,42 @@ export const Middleware = (
     req: Request,
     res: Response,
     next: NextFunction
-    ) => {
+) => {
     try {
-        const token = req.headers["authorization"];
-        if (!token) {
-            return res.status(403).json({
-                message: "Unauthorized",
-            });
-        }
-        
-        // // Extract token from "Bearer <token>"
-        // const token = token.split(" ")[1];
-        
-        // if (!token) {
-        //     console.log(token);
-        // return res.status(403).json({
-        //     message: "Unauthorized",
-        // });
-        // }
-        const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const authHeader = req.headers["authorization"];
+    // authHeader: Bearer abc123xyz
 
-        if (!decoded || !decoded.userId) {
+    if (!authHeader) {
         return res.status(403).json({
-            message: "Unauthorized",
+        message: "Unauthorized",
         });
-        }
-        // @ts-ignore
-        // Attach userId to request
-        req.userId = decoded.userId;
+    }
 
-        next();
-    } catch (err) {
-        return res.status(500).json({
-        message: "Something went wrong",
+    const parts = authHeader.split(" ");
+    // ["Bearer", "abc123xyz"]
+
+    if (parts.length !== 2 || parts[0] !== "Bearer") {//👉 Ensures: * First word = "Bearer" * Second = actual token
+        return res.status(403).json({
+        message: "Invalid token format",
         });
+    }
+
+    const token = parts[1];
+
+    const decoded = jwt.verify(token as string, JWT_SECRET) as JwtPayload;
+
+    if (!decoded || !decoded.userId) {
+        return res.status(403).json({
+        message: "Unauthorized",
+        });
+    }
+    
+    req.userId = decoded.userId;
+
+    next();
+    } catch (err) {
+    return res.status(403).json({
+        message: "Invalid or expired token",
+    });
     }
 };

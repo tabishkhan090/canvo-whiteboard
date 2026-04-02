@@ -1,0 +1,165 @@
+# 📦 DB GUIDE (Prisma + Env + Build Setup)
+
+## 🧠 Purpose
+This file documents how the database layer is configured in this project  
+So in future, I don’t waste time debugging setup again.
+
+---
+
+## 📁 Project Context
+- Monorepo (pnpm workspace)
+- DB package: packages/db
+- ORM: Prisma
+- Language: TypeScript (ESM)
+
+---
+
+## ⚙️ Prisma Setup
+
+### Generator Configuration
+
+prisma generator client {   provider = "prisma-client"   output   = "../src/generated/prisma" } 
+
+### 📌 Meaning
+- Prisma client is generated inside:
+    src/generated/prisma  
+- This allows direct imports inside TS code like:
+  ts   import { PrismaClient } from "../generated/prisma/client.js";   
+
+---
+
+## ⚠️ Important Note (VERY IMPORTANT)
+
+Since output is inside src:
+- TypeScript WILL compile generated code
+- Output will go to:
+    dist/src/generated/prisma  
+
+👉 So always import using .js extension (ESM requirement)
+
+---
+
+## 📦 Dependencies Used
+
+json "@types/node": "^22.15.3", "dotenv": "^17.3.1" 
+
+### Why?
+
+- @types/node → enables process, __dirname, etc.
+- dotenv → loads .env variables (DATABASE_URL, JWT_SECRET)
+
+---
+
+## 🌱 Environment Setup
+
+We manually load .env because of monorepo:
+
+ts import { config } from "dotenv"; import { resolve } from "node:path";  config({   path: resolve(__dirname, "../../.env") }); 
+
+### 📌 Why?
+- .env is stored at root
+- Code runs inside packages/db
+- So default dotenv won’t find it
+
+---
+
+## 🏗️ TypeScript Config
+
+json {   "compilerOptions": {     "rootDir": "src",     "outDir": "dist"   },   "include": ["src"] } 
+
+### 📌 Meaning
+- Source → src
+- Build → dist
+- Only src is compiled
+
+---
+
+## 📦 Build Output Structure
+
+src/index.ts → dist/src/index.js
+
+---
+
+## 📤 Package Exports
+
+json "exports": {   ".": "./dist/src/index.js",   "./prisma": "./dist/src/index.js" } 
+
+### 📌 Meaning
+- Other packages can import like:
+
+ts import { prisma } from "@repo/db"; 
+
+or
+
+ts import { prisma } from "@repo/db/prisma"; 
+
+---
+
+## 🧪 Prisma Generate Command
+
+bash npx prisma generate 
+
+### 📌 What it does
+- Generates Prisma client based on schema.prisma
+- Output goes to:
+    src/generated/prisma  
+
+---
+
+## ⚠️ Common Mistakes
+
+### ❌ 1. .env not loading
+- Fix: ensure correct path (../../.env)
+
+---
+
+### ❌ 2. DATABASE_URL undefined
+- Always validate:
+
+ts if (!process.env.DATABASE_URL) {   throw new Error("DATABASE_URL is not defined"); } 
+
+---
+
+### ❌ 3. dist file not found
+- Cause: TS not compiling correctly
+- Fix:
+  - Check include: ["src"]
+  - Ensure src/index.ts exists
+
+---
+
+### ❌ 4. Prisma import error
+- Always use .js extension in ESM:
+
+ts import { PrismaClient } from "../generated/prisma/client.js"; 
+
+---
+
+## 🔥 Best Practices (Follow Always)
+
+- Keep .env at root
+- Always validate env variables
+- Never hardcode DB URL
+- Use global Prisma instance (avoid multiple connections)
+- Don’t mix generated code manually
+
+---
+
+## 🧠 Final Summary
+
+- Prisma output → inside src
+- TS compiles → src → dist
+- Env loaded manually → due to monorepo
+- Exports → from built dist folder
+
+---
+
+## 🚀 Future Improvements (Optional)
+
+- Move env loader to shared config package
+- Create @repo/config
+- Share Prisma client across services cleanly
+
+---
+
+END OF GU
