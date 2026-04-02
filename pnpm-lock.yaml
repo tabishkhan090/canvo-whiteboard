@@ -130,6 +130,10 @@ importers:
         version: link:../../packages/typescript-config
 
   packages/backend-common:
+    dependencies:
+      dotenv:
+        specifier: ^17.3.1
+        version: 17.3.1
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*

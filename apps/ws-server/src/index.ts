@@ -12,7 +12,9 @@ interface User {
     rooms : string[],
     userId: string
 }
+
 const users: User[] = [];
+
 
 function checkUser(token: string): string | null {
     const result = jwt.verify(token,JWT_SECRET);
@@ -25,11 +27,16 @@ function checkUser(token: string): string | null {
 
     return result.userId;
 }
+
 wss.on('connection', function connection(ws, Request) { //Run when new user connect for the first time
+    // WebSocket first starts as HTTP
+    // then upgrades to WebSocket
+    // What is inside Request? Request.url, Request.headers
     if(!Request.url){
         ws.close();
         return;
     }
+    
     const queryParams = new URLSearchParams(Request.url.split('?')[1]);
     const token = queryParams.get('token') || "";
     console.log(token);
@@ -66,7 +73,8 @@ wss.on('connection', function connection(ws, Request) { //Run when new user conn
             const user = users.find(x => x.ws===ws);
             if(!user)  
                 return
-            user?.rooms.filter(parsedData.roomId);
+            user.rooms = user.rooms.filter(
+            room => room !== parsedData.roomId);
         }
         
         // console.log(users);
