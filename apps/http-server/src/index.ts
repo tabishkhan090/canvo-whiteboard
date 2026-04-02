@@ -6,8 +6,11 @@ import { prisma } from "@repo/db"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import dotenv from "dotenv";
+import cors from "cors"
+
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.post("/signup", async (req, res) =>{
     const parsedData = CreateUserSchema.safeParse(req.body);
@@ -120,6 +123,7 @@ app.post("/room", Middleware, async (req, res) =>{
         }
         // @ts-ignore
         const userId = req.userId;
+        console.log(userId);
         const room = await prisma.room.create({
         data: {
             slug : parsedData.data?.name,
@@ -140,7 +144,7 @@ app.post("/room", Middleware, async (req, res) =>{
     }
 })
 
-app.get("/chats/:roomId", Middleware, async (req, res) =>{
+app.get("/chats/:roomId", async (req, res) =>{
     const roomId = Number(req.params.roomId);
     try{
         const chats = await prisma.chat.findMany({
@@ -150,7 +154,7 @@ app.get("/chats/:roomId", Middleware, async (req, res) =>{
         orderBy: {
             id: "desc"
         },
-        take: 1000
+        take: 50
         })
         res.json({
             success: true,

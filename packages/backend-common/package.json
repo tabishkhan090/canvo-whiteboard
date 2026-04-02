@@ -8,13 +8,10 @@
     ".": "./src/index.ts",
     "./config": "./src/index.ts"
   },
-  "scripts": {
-  },
-  "dependencies": {
-    "@types/node": "^22.15.3"
-  },
+  "scripts": {},
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*"
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.15.3"
   },
   "keywords": [],
   "author": "",

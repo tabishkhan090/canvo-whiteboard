@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken"
 import {WebSocket, WebSocketServer} from "ws"
 import { prisma } from "@repo/db";
 // const JWT_SECRET = "ewrcwectrewtrevtw"
-const wss = new WebSocketServer({port: 8080},()=>{
-    console.log("port is running on: 8080")
+const wss = new WebSocketServer({port: 8081},()=>{ //Here we are creating new webSocket server
+    console.log("port is running on: 8081")
 });
 
 interface User {
@@ -25,7 +25,7 @@ function checkUser(token: string): string | null {
 
     return result.userId;
 }
-wss.on('connection', function connection(ws, Request) {
+wss.on('connection', function connection(ws, Request) { //Run when new user connect for the first time
     if(!Request.url){
         ws.close();
         return;
@@ -44,7 +44,8 @@ wss.on('connection', function connection(ws, Request) {
         rooms: [],
         userId
     })
-    
+
+    //This runs whenever the user sends something from the frontend to the WebSocket server
     ws.on('message', async function message(data){
         let parsedData;
         try {
@@ -68,25 +69,26 @@ wss.on('connection', function connection(ws, Request) {
             user?.rooms.filter(parsedData.roomId);
         }
         
-        console.log(users);
+        // console.log(users);
         if(parsedData.type ==="chat"){
             const roomId = parsedData.roomId;
             const message = parsedData.message;
-            await prisma.chat.create({
-                data: {
-                    roomId: Number(roomId),
-                    message,
-                    userId
-                }
-            })
-        
+            
             users.forEach(user => {
-                if(user.rooms.includes(roomId)){
+                if(user.rooms.includes(roomId) && user.ws !== ws){
                     user.ws.send(JSON.stringify({
                         type: "chat",
                         message,
                         roomId
                     }))
+                }
+            })
+            
+            await prisma.chat.create({
+                data: {
+                    roomId: Number(roomId),
+                    message,
+                    userId
                 }
             })
         }
