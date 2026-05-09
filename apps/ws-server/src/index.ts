@@ -78,7 +78,7 @@ wss.on('connection', function connection(ws, Request) { //Run when new user conn
         }
         
         // console.log(users);
-        if(parsedData.type ==="chat"){
+        if(parsedData.type === "chat"){
             const roomId = parsedData.roomId;
             const message = parsedData.message;
             
