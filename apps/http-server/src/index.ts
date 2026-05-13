@@ -1,4 +1,4 @@
-import { JWT_SECRET } from "@repo/backend-common/config"
+import { JWT_SECRET } from "@repo/backend-common"
 import { CreateUserSchema, SigninSchema, CreateRoomSchema } from "@repo/common/types"
 import express from "express"
 import { Middleware } from "./middleware"
@@ -11,7 +11,6 @@ import cors from "cors"
 const app = express();
 app.use(express.json());
 app.use(cors());
-
 app.post("/signup", async (req, res) =>{
     const parsedData = CreateUserSchema.safeParse(req.body);
     if(!parsedData.success){
@@ -190,6 +189,6 @@ app.get("/chats/:roomId", async (req, res) =>{
     }
 })
 
-app.listen(3001, ()=>{
-    console.log("Server running on port 3000");
+app.listen(3001, () => {
+    console.log("HTTP server running on port 3001");
 });
