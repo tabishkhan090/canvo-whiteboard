@@ -1,11 +1,12 @@
-import { JWT_SECRET } from "@repo/backend-common"
+import { loadEnv } from "@repo/backend-common/loadEnv"
+loadEnv(); // This will populated .env global object:
+import { env } from "@repo/backend-common" //-> getEnv() → Read & Validate
 import { CreateUserSchema, SigninSchema, CreateRoomSchema } from "@repo/common/types"
 import express from "express"
 import { Middleware } from "./middleware"
 import { prisma } from "@repo/db/prisma"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
-import dotenv from "dotenv"
 import cors from "cors"
 
 const app = express();
@@ -84,7 +85,7 @@ app.post("/signin", async (req, res) => {
         }
         const token = jwt.sign(
             { userId: user.id },
-            JWT_SECRET,
+            env.JWT_SECRET,
             { expiresIn: "7d" }
         );
         return res.status(200).json({

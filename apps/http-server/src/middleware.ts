@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { JWT_SECRET } from "@repo/backend-common";
+import { env } from "@repo/backend-common";
 // console.log(JWT_SECRET);
 export const Middleware = (
     req: Request,
@@ -28,7 +28,7 @@ export const Middleware = (
 
     const token = parts[1];
 
-    const decoded = jwt.verify(token as string, JWT_SECRET) as JwtPayload;
+    const decoded = jwt.verify(token as string, env.JWT_SECRET) as JwtPayload;
 
     if (!decoded || !decoded.userId) {
         return res.status(403).json({
