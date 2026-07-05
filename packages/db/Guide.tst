@@ -80,5 +80,22 @@ This is why your Prisma import worked:
 Why is NodeNext recommended?
 
 Without it, TypeScript might generate code that compiles successfully but fails when Node executes it.
-
 NodeNext keeps TypeScript’s behavior aligned with Node.js, reducing surprises at runtime.
+
+
+**Final setup for Prisma** :-
+        package.json
+        "type": "module"
+
+        ↓
+
+        tsconfig
+
+        module: NodeNext
+        moduleResolution: NodeNext
+
+        ↓
+
+        src/index.ts
+
+        import "./client.js". -> ts is smart enough to understand client.ts convert to .js bcoz of NodeNext
