@@ -1,4 +1,4 @@
-import { PrismaClient } from "./generated/prisma/client.js";
+import { PrismaClient } from "./generated/prisma/client.js";  //->.  NodeNext teaches TypeScript the same import rules that Node.js follows at runtime.
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
