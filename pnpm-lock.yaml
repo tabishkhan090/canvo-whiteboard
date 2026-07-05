@@ -179,6 +179,9 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
     devDependencies:
+      '@repo/backend-common':
+        specifier: workspace:*
+        version: link:../backend-common
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config

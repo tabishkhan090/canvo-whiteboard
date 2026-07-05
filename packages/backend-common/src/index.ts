@@ -1,9 +1,16 @@
-import dotenv from "dotenv";
-dotenv.config({ path: ".env" });
-const secret = process.env.JWT_SECRET;
+function getEnv(key: string): string {
+    const value = process.env[key];
 
-if (!secret) {
-    throw new Error("JWT_SECRET is not defined");
+    if (!value) {
+        throw new Error(`${key} is not defined`);
+    }
+
+    return value;
 }
 
-export const JWT_SECRET = secret;
+export const env = {
+    JWT_SECRET: getEnv("JWT_SECRET"),
+    DATABASE_URL: getEnv("DATABASE_URL"),
+    // PORT: getEnv("PORT"),
+    // REDIS_URL: getEnv("REDIS_URL"),
+} as const;
