@@ -15,13 +15,18 @@ datasource db {
 
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique 
-  password  String
-  name      String
-  photo     String?
-  rooms     Room[]
-  chats     Chat[]
+  id                  String    @id @default(uuid())
+  username            String
+  email               String    @unique
+  password            String
+  isVerified          Boolean   @default(false)
+  verificationCode    String?
+  verificationExpiry  DateTime?
+  photo               String?
+  rooms               Room[]
+  chats               Chat[]
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 }
 
 model Room {
