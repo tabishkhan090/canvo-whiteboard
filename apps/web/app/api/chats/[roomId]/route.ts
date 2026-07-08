@@ -1,3 +1,4 @@
+//TODO: Add extra feild or table for rooom member. So only they see their room chats.
 import { prisma } from "@repo/db/prisma"
 import { getServerSession, User } from "next-auth";
 import { NextRequest } from "next/server";
