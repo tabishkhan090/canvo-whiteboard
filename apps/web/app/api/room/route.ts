@@ -1,9 +1,25 @@
 import { CreateRoomSchema } from "@repo/common/types"
 import { prisma } from "@repo/db/prisma"
+import { getServerSession, User } from "next-auth";
 import { NextRequest } from "next/server"
+import { NEXT_AUTH_CONFIG } from "../../../lib/auth";
 
 export async function POST(request: NextRequest){
     try{
+        const session = await getServerSession(NEXT_AUTH_CONFIG);
+        if(!session || !session.user){
+            return Response.json(
+                {
+                    success: false,
+                    message: 'Not Authenticated'
+                },
+                {
+                    status: 401
+                }
+            )
+        }
+        const user: User = session.user;
+        const userId = user.id;
         const body = await request.json();
         const parseData = CreateRoomSchema.safeParse(body);
         if(!parseData.success){
@@ -36,10 +52,10 @@ export async function POST(request: NextRequest){
         const room = await prisma.room.create({
             data: {
                 slug: parseData.data.name,
-                adminId: "2323"
+                adminId: userId
             }
         })
-        Response.json(
+        return Response.json(
             {
                 success: true,
                 roomId: room.id
@@ -49,6 +65,14 @@ export async function POST(request: NextRequest){
             }
         )
     }catch(error){
-
+        return Response.json(
+            {
+                success: false,
+                message: 'Something went wrong'
+            },
+            {
+                status: 500
+            }
+        )
     }
 }
