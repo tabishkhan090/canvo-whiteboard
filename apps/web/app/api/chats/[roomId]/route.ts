@@ -18,7 +18,24 @@ export async function GET(Request: NextRequest, {params}: {params :{roomid: stri
         )
     }
     try{
-        const chats = prisma.chat.findMany({
+        const room = await prisma.room.findUnique({
+        where: {
+            id: Number(roomId),
+            },
+        });
+
+        if (!room) {
+            return Response.json(
+                {
+                    success: false,
+                    message: "Room not found",
+                },
+                {
+                    status: 404,
+                }
+            );
+        }
+        const chats = await prisma.chat.findMany({
             where: {
                 roomId: Number(roomId)
             },
@@ -33,7 +50,7 @@ export async function GET(Request: NextRequest, {params}: {params :{roomid: stri
                 chats
             },
             {
-                status: 202
+                status: 200
             }
         )
     }catch(error){
