@@ -4,7 +4,6 @@ import { prisma } from "@repo/db/prisma"
 import bcrypt from "bcrypt"
 
 export async function POST(request: NextRequest){
-    console.log("hi");
     try{
         const body = await request.json();
         const parseData = CreateUserSchema.safeParse(body);
