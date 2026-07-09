@@ -65,6 +65,7 @@ app.post("/signin", async (req, res) => {
     try {
         const user = await prisma.user.findUnique({
             where: {
+                //@ts-ignore
                 email: parsedData.data.username,
             }
         });
