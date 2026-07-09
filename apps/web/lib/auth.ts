@@ -9,53 +9,83 @@ import bcrypt from "bcrypt"
 export const NEXT_AUTH_CONFIG : NextAuthOptions = {
     providers: [
         CredentialsProvider ({
-            id: "Credentials",
-            name: "Credentials",
+            name: "credentials",
             credentials: {
-                email: {label: 'Email', type: 'email', placeholder: 'Enter your Email or username'},
-                password: {label: 'password', type: 'text', placeholder: 'Enter your password'},
+                identifier: {
+                    label: "Email or Username",
+                    type: "text",
+                    placeholder: "Enter your email or username",
+                },
+                password: {
+                    label: "Password",
+                    type: "password",
+                    placeholder: "Enter your password",
+                },
             },
-            async authorize(credentials: any ) :Promise<any> {
-                try{
+            async authorize(credentials) {
+                const parsed = SigninSchema.safeParse(credentials);
+
+                if (!parsed.success) {
+                    return null;
+                }
+
+                const { identifier, password } = parsed.data;
+
+                try {
                     const user = await prisma.user.findFirst({
                         where: {
                             OR: [
-                                { email: credentials.identifier },
-                                { username: credentials.identifier },
+                                { email: identifier },
+                                { username: identifier },
                             ],
                         },
                     });
-                    if(!user){
-                        throw new Error('No user found with this email');
+
+                    if (!user) {
+                        return null;
                     }
-                    if(!user.isVerified){
-                        throw new Error('please verify your account before logging in');
+
+                    if (!user.isVerified) {
+                        return null;
                     }
-                    const isPasswordCorrect = await bcrypt.compare(credentials.password, user.password);
-                    if(!isPasswordCorrect)
-                        throw new Error('Invalid Password');
-                    return user;
-                }catch(error: any){
-                    throw new Error( error );
+
+                    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+                    if (!isPasswordCorrect) {
+                        return null;
+                    }
+
+                    return {
+                        id: user.id,
+                        email: user.email,
+                        name: user.username,
+                        username: user.username,
+                        isVerified: user.isVerified,
+                    };
+                } catch (error) {
+                    console.error(error);
+                    return null;
                 }
             }
         }),
     ],
     callbacks: {
-        jwt: async ({token,user} : any) => {
-            if(user){
-                token.id = user.id.toString();
-                token.isVerified = user.isVerified;
+        async jwt({ token, user }) {
+            if (user) {
+                token.id = user.id;
                 token.username = user.username;
+                token.isVerified = user.isVerified;
             }
+
             return token;
         },
-        session: async ({session, token} : any) => {
-            if(token){
-                session.id = token.id.toString();
-                session.isVerified = token.isVerified;
-                session.username = token.username;
+        async session({ session, token }) {
+            if (session.user) {
+                session.user.id = token.id as string;
+                session.user.username = token.username as string;
+                session.user.isVerified = token.isVerified as boolean;
             }
+
             return session;
         }
     },

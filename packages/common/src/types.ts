@@ -26,11 +26,10 @@ export const CreateUserSchema = z.object({
 export type CreateUserInput = z.infer<typeof CreateUserSchema>;
 
 export const SigninSchema = z.object({
-    username: z
+    identifier: z
         .string()
         .trim()
-        .min(2, "Name must be at least 2 characters")
-        .max(50, "Name cannot exceed 50 characters"),
+        .min(2, "Email or username is required"),
 
     password: z
         .string()
@@ -40,7 +39,7 @@ export const SigninSchema = z.object({
         .regex(/[a-z]/, "Must contain at least one lowercase letter")
         .regex(/[0-9]/, "Must contain at least one number")
         .regex(/[^A-Za-z0-9]/, "Must contain at least one special character"),
-})
+});
 
 export const CreateRoomSchema = z.object({
     name: z
