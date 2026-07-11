@@ -1,8 +1,7 @@
-import { JWT_SECRET } from "@repo/backend-common/config"
+import { env } from "@repo/backend-common"
 import jwt from "jsonwebtoken"
 import {WebSocket, WebSocketServer} from "ws"
-import { prisma } from "@repo/db";
-// const JWT_SECRET = "ewrcwectrewtrevtw"
+import { prisma } from "@repo/db/prisma";
 const wss = new WebSocketServer({port: 8081},()=>{ //Here we are creating new webSocket server
     console.log("port is running on: 8081")
 });
@@ -17,14 +16,13 @@ const users: User[] = [];
 
 
 function checkUser(token: string): string | null {
-    const result = jwt.verify(token,JWT_SECRET);
+    const result = jwt.verify(token,env.JWT_SECRET);
     if(typeof result == "string"){
         return null;
     }
     if(!result || !result.userId){
         return null;
     }
-
     return result.userId;
 }
 
