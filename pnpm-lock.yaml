@@ -139,6 +139,9 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.3
         version: 9.0.3
+      next-auth:
+        specifier: ^4.24.14
+        version: 4.24.14(next@16.1.5(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       ws:
         specifier: ^8.19.0
         version: 8.19.0

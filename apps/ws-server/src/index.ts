@@ -1,3 +1,4 @@
+import { getToken } from "next-auth/jwt";
 import { env } from "@repo/backend-common"
 import jwt from "jsonwebtoken"
 import {WebSocket, WebSocketServer} from "ws"
@@ -14,36 +15,24 @@ interface User {
 
 const users: User[] = [];
 
-
-function checkUser(token: string): string | null {
-    const result = jwt.verify(token,env.JWT_SECRET);
-    if(typeof result == "string"){
-        return null;
-    }
-    if(!result || !result.userId){
-        return null;
-    }
-    return result.userId;
-}
-
-wss.on('connection', function connection(ws, Request) { //Run when new user connect for the first time
+wss.on('connection', async function connection(ws, Request) { //Run when new user connect for the first time
     // WebSocket first starts as HTTP
     // then upgrades to WebSocket
     // What is inside Request? Request.url, Request.headers
-    if(!Request.url){
-        ws.close();
-        return;
-    }
-    
-    const queryParams = new URLSearchParams(Request.url.split('?')[1]);
-    const token = queryParams.get('token') || "";
-    console.log(token);
-    const userId = checkUser(token);
+    const token = await getToken({
+        req: Request as any,
+        secret: env.NEXTAUTH_SECRET
+    })
+    const userId = token?.userId;
+
     if (!userId) {
         ws.close();
         return;
     }
-    
+    if (typeof userId !== "string"){
+        ws.close();
+        return;
+    }
     users.push({
         ws,
         rooms: [],
