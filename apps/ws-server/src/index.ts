@@ -1,10 +1,8 @@
 import { loadEnv } from "@repo/backend-common/loadEnv"
 loadEnv();
-import { decode } from "next-auth/jwt";
-import { env } from "@repo/backend-common"
-import {WebSocket, WebSocketServer} from "ws"
+import { getUserIdFromRequest } from "./helper"
+import { WebSocket, WebSocketServer } from "ws"
 import { prisma } from "@repo/db/prisma";
-import jsonwebtoken from "jsonwebtoken";
 
 
 const wss = new WebSocketServer({port: 8081},()=>{ //Here we are creating new webSocket server
@@ -19,31 +17,7 @@ interface User {
 
 const users: User[] = [];
 
-// convert it into an object:
-// {
-//     "next-auth.session-token": "eyJ..."
-// }
-function getCookieMap(cookieHeader?: string) {
-    return Object.fromEntries(
-        (cookieHeader ?? "")
-            .split(";")
-            .map(cookie => cookie.trim().split("="))
-            .filter(([key, value]) => key && value)
-            .map(([key, ...value]) => [key, decodeURIComponent(value.join("="))])
-    );
-}
 
-async function getUserIdFromRequest(request: { url?: string; headers?: { cookie?: string } }) {
-    const cookies = getCookieMap(request.headers?.cookie ?? undefined);
-    // console.log(cookies);
-    const payload = await decode({
-        token: cookies['next-auth.session-token'],
-        secret: env.NEXTAUTH_SECRET,
-    });
-    
-    // console.log(payload);
-    return payload?.id as string;
-}
 
 wss.on('connection', async function connection(ws, request) { //Run when new user connect for the first time
     // WebSocket first starts as HTTP
