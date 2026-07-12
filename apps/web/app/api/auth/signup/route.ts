@@ -71,8 +71,7 @@ export async function POST(request: NextRequest){
                 }
             })
 
-            //email verificstion
-            //->>
+            //->> Todo: email verificstion
             
             return Response.json(
                 {
