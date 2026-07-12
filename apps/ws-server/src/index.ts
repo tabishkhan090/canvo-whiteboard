@@ -1,8 +1,12 @@
-import { getToken } from "next-auth/jwt";
+import { loadEnv } from "@repo/backend-common/loadEnv"
+loadEnv();
+import { decode } from "next-auth/jwt";
 import { env } from "@repo/backend-common"
-import jwt from "jsonwebtoken"
 import {WebSocket, WebSocketServer} from "ws"
 import { prisma } from "@repo/db/prisma";
+import jsonwebtoken from "jsonwebtoken";
+
+
 const wss = new WebSocketServer({port: 8081},()=>{ //Here we are creating new webSocket server
     console.log("port is running on: 8081")
 });
@@ -15,21 +19,48 @@ interface User {
 
 const users: User[] = [];
 
-wss.on('connection', async function connection(ws, Request) { //Run when new user connect for the first time
+// convert it into an object:
+// {
+//     "next-auth.session-token": "eyJ..."
+// }
+function getCookieMap(cookieHeader?: string) {
+    return Object.fromEntries(
+        (cookieHeader ?? "")
+            .split(";")
+            .map(cookie => cookie.trim().split("="))
+            .filter(([key, value]) => key && value)
+            .map(([key, ...value]) => [key, decodeURIComponent(value.join("="))])
+    );
+}
+
+async function getUserIdFromRequest(request: { url?: string; headers?: { cookie?: string } }) {
+    const cookies = getCookieMap(request.headers?.cookie ?? undefined);
+    // console.log(cookies);
+    const payload = await decode({
+        token: cookies['next-auth.session-token'],
+        secret: env.NEXTAUTH_SECRET,
+    });
+    
+    // console.log(payload);
+    return payload?.id as string;
+}
+
+wss.on('connection', async function connection(ws, request) { //Run when new user connect for the first time
     // WebSocket first starts as HTTP
     // then upgrades to WebSocket
     // What is inside Request? Request.url, Request.headers
-    const token = await getToken({
-        req: Request as any,
-        secret: env.NEXTAUTH_SECRET
-    })
-    const userId = token?.userId;
-
-    if (!userId) {
+    // console.log(request.headers.cookie);
+    let userId: string | null;
+    try {
+        userId = await getUserIdFromRequest(request as any);
+    } catch (error) {
+        console.error("Authentication failed:", error);
         ws.close();
         return;
     }
-    if (typeof userId !== "string"){
+    console.log("userId:", userId);
+
+    if (typeof userId !== "string") {
         ws.close();
         return;
     }
@@ -38,6 +69,14 @@ wss.on('connection', async function connection(ws, Request) { //Run when new use
         rooms: [],
         userId
     })
+
+    ws.on("close", () => {
+        const index = users.findIndex(user => user.ws === ws);
+
+        if (index !== -1) {
+            users.splice(index, 1);
+        }
+    });
 
     //This runs whenever the user sends something from the frontend to the WebSocket server
     ws.on('message', async function message(data){
