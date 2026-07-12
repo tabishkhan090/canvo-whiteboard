@@ -17,8 +17,6 @@ interface User {
 
 const users: User[] = [];
 
-
-
 wss.on('connection', async function connection(ws, request) { //Run when new user connect for the first time
     // WebSocket first starts as HTTP
     // then upgrades to WebSocket
@@ -34,7 +32,7 @@ wss.on('connection', async function connection(ws, request) { //Run when new use
     }
     console.log("userId:", userId);
 
-    if (typeof userId !== "string") {
+    if (!userId || typeof userId !== "string") {
         ws.close();
         return;
     }
@@ -46,7 +44,6 @@ wss.on('connection', async function connection(ws, request) { //Run when new use
 
     ws.on("close", () => {
         const index = users.findIndex(user => user.ws === ws);
-
         if (index !== -1) {
             users.splice(index, 1);
         }
