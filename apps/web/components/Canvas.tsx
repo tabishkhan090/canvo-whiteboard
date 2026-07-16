@@ -2,17 +2,12 @@
 import { useEffect, useRef } from "react";
 import { initDraw } from "../draw";
 
-export function Canvas({roomId, socket, selectedTool}: {roomId: string, socket: WebSocket, selectedTool: "rect" | "circle" | "text"}){
+export function Canvas({roomId, socket}: {roomId: string, socket: WebSocket}){
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const selectedToolRef = useRef(selectedTool);
-    
-    useEffect(() => {
-        selectedToolRef.current = selectedTool;
-    }, [selectedTool]);
     
     useEffect(()=>{
         if(canvasRef.current)
-            initDraw(canvasRef.current, roomId, socket, selectedToolRef);
+            initDraw(canvasRef.current, roomId, socket);
     },[canvasRef])
     
     return <div style={{ marginTop: "60px", backgroundColor: "#1a1a1a", minHeight: "100vh" }}>
