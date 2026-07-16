@@ -4,8 +4,9 @@ import { getServerSession, User } from "next-auth";
 import { NextRequest } from "next/server";
 import { NEXT_AUTH_CONFIG } from "../../../../lib/auth";
 
-export async function GET(Request: NextRequest, {params}: {params :{roomid: string}}){
-    const roomId = params.roomid;
+export async function GET(request: NextRequest, {params}: { params: Promise<{ roomId: string }> }){
+    const { roomId } = await params;
+    console.log(roomId);
     const session = await getServerSession(NEXT_AUTH_CONFIG);
     if(!session || !session.user){
         return Response.json(

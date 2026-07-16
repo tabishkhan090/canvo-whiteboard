@@ -59,7 +59,7 @@ wss.on('connection', async function connection(ws, request) { //Run when new use
             console.error("Invalid JSON received:", e);
             return;
         }
-        console.log(parsedData);
+        // console.log(parsedData);
         
         if(parsedData.type ==="join_room"){
             const user = users.find(x => x.ws===ws);
