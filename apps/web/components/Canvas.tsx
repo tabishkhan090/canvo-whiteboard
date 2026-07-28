@@ -16,6 +16,7 @@ export function Canvas({roomId, socket}: {roomId: string, socket: WebSocket}){
     },[canvasRef])
 
     useEffect(()=>{
+        //window is a global object provided by the browser. It is not part of React.
         //@ts-ignore
         window.selectedTool = selectedTool;
     },[selectedTool])
