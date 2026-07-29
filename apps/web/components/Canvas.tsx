@@ -3,23 +3,29 @@ import { useEffect, useRef, useState } from "react";
 import { initDraw } from "../draw";
 import { IconButton } from "./iconBotton";
 import { Circle, Pencil, RectangleHorizontalIcon } from "lucide-react";
+import { Game } from "../draw/game";
 
 type Shape = "Circle" | "Rect" | "Pencil"
 
 export function Canvas({roomId, socket}: {roomId: string, socket: WebSocket}){
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [selectedTool, setSelectedTool] = useState<Shape>("Circle")
+    const [selectedTool, setSelectedTool] = useState<Shape>("Circle");
+    const [game, setGame] = useState<Game>();
     
     useEffect(()=>{
-        if(canvasRef.current)
-            initDraw(canvasRef.current, roomId, socket);
+        if(canvasRef.current){
+            const g = new Game(canvasRef.current, roomId, socket);
+            setGame(g);
+        }
+        // initDraw(canvasRef.current, roomId, socket);
     },[canvasRef])
 
     useEffect(()=>{
-        //window is a global object provided by the browser. It is not part of React.
-        //@ts-ignore
-        window.selectedTool = selectedTool;
-    },[selectedTool])
+        // //window is a global object provided by the browser. It is not part of React.
+        // //@ts-ignore
+        // window.selectedTool = selectedTool;
+        game?.setTool(selectedTool);
+    },[selectedTool, game])
     
     return (
         <div className="min-h-screen w-screen overflow-hidden">

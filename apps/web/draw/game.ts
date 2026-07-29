@@ -1,5 +1,4 @@
 import { getExistingShapes } from "./http";
-
 type shapes = {
     type: "Rect";
     x: number;
@@ -8,10 +7,9 @@ type shapes = {
     height: number;
 } | {
     type: "Circle";
-    x: number;
-    y: number;
-    width: number;
-    height: number;
+    centerX: number;
+    centerY: number;
+    radius: number;
 } | {
     type: "Pencil";
     x: number;
@@ -74,11 +72,11 @@ export class Game{
             if(x.type=="Rect"){
                 this.ctx?.strokeRect(x.x, x.y, x.width, x.height);
             }else if(x.type == "Circle"){
-                const centerX = x.x + x.width/2;
-                const centerY = x.y + x.height/2;
-                const radius = Math.max(x.width,x.height) / 2;
+                // const centerX = x.x + x.width/2;
+                // const centerY = x.y + x.height/2;
+                // const radius = Math.max(x.width,x.height) / 2;
                 this.ctx?.beginPath()
-                this.ctx?.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                this.ctx?.arc(x.centerX, x.centerY, Math.abs(x.radius), 0, Math.PI * 2);
                 this.ctx?.stroke();
                 this.ctx?.closePath();
             }
@@ -92,16 +90,29 @@ export class Game{
     }
     mouseUpHandler(e: any){
         this.clicked = false;
-        const width = e.clientX - this.startX;
-        const height = e.clientY - this.startY;
-        
-        const shape: shapes = {
-            type: this.selectedTool,
-            x: this.startX,
-            y: this.startY,
-            height,
-            width
+        let shape: shapes | null=null;
+        if(this.selectedTool == "Rect"){
+            const width = e.clientX - this.startX;
+            const height = e.clientY - this.startY;
+            shape = {
+                type: this.selectedTool,
+                x: this.startX,
+                y: this.startY,
+                height,
+                width
+            }
+        }else if(this.selectedTool == "Circle"){
+            const centerX = this.startX + e.clientX - this.startX / 2;
+            const centerY = this.startY + e.clientY - this.startY / 2;
+            shape = {
+                type: this.selectedTool,
+                centerX,
+                centerY,
+                radius: Math.max(centerX, centerY) / 2
+            }
         }
+        if (!shape)
+            return;
         this.existingShapes.push(shape);
         this.socket.send(JSON.stringify({
             type: "chat",
@@ -124,7 +135,7 @@ export class Game{
                 const centerY = this.startY + height/2;
                 const radius = Math.max(width,height) / 2;
                 this.ctx?.beginPath()
-                this.ctx?.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                this.ctx?.arc(centerX, centerY, Math.abs(radius), 0, Math.PI * 2);
                 this.ctx?.stroke();
                 this.ctx?.closePath();
             }
