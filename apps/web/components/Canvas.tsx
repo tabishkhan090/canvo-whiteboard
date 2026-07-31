@@ -12,20 +12,25 @@ export function Canvas({roomId, socket}: {roomId: string, socket: WebSocket}){
     const [selectedTool, setSelectedTool] = useState<Shape>("Circle");
     const [game, setGame] = useState<Game>();
     
-    useEffect(()=>{
-        if(canvasRef.current){
-            const g = new Game(canvasRef.current, roomId, socket);
-            setGame(g);
-        }
-        // initDraw(canvasRef.current, roomId, socket);
-    },[canvasRef])
-
+    
     useEffect(()=>{
         // //window is a global object provided by the browser. It is not part of React.
         // //@ts-ignore
         // window.selectedTool = selectedTool;
         game?.setTool(selectedTool);
     },[selectedTool, game])
+    
+    useEffect(()=>{
+        if(canvasRef.current){
+            const g = new Game(canvasRef.current, roomId, socket);
+            setGame(g);
+
+            return ()=>{
+                g.destroy();
+            }
+        }
+        // initDraw(canvasRef.current, roomId, socket);
+    },[canvasRef])
     
     return (
         <div className="min-h-screen w-screen overflow-hidden">

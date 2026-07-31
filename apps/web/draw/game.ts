@@ -40,6 +40,11 @@ export class Game{
         this.initMouseHandlers();
     }
 
+    destroy(){
+        this.canvas.removeEventListener("mousedown",this.mouseDownHandler);
+        this.canvas.removeEventListener("mouseup",this.mouseUpHandler);
+        this.canvas.removeEventListener("mousemove",this.mouseMoveHandler);
+    }
     setTool(tool: "Circle" | "Pencil" | "Rect"){
         this.selectedTool = tool;
     }
@@ -62,6 +67,7 @@ export class Game{
     }
 
     clearCanvas(){
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle = "#1a1a1a";
         this.ctx.fillRect(0, 0,this.canvas.width,this.canvas.height);
         
@@ -69,12 +75,9 @@ export class Game{
         this.ctx.lineWidth = 2;
 
         this.existingShapes.map((x)=>{
-            if(x.type=="Rect"){
+            if(x.type === "Rect"){
                 this.ctx?.strokeRect(x.x, x.y, x.width, x.height);
-            }else if(x.type == "Circle"){
-                // const centerX = x.x + x.width/2;
-                // const centerY = x.y + x.height/2;
-                // const radius = Math.max(x.width,x.height) / 2;
+            }else if(x.type === "Circle"){
                 this.ctx?.beginPath()
                 this.ctx?.arc(x.centerX, x.centerY, Math.abs(x.radius), 0, Math.PI * 2);
                 this.ctx?.stroke();
@@ -83,15 +86,15 @@ export class Game{
         })
     }
 
-    mouseDownHandler(e: any){
+    mouseDownHandler = (e: any) => {
         this.clicked = true;
         this.startX = e.clientX;
-        this.startY = e.clientX;
+        this.startY = e.clientY;
     }
-    mouseUpHandler(e: any){
+    mouseUpHandler = (e: any) => {
         this.clicked = false;
         let shape: shapes | null=null;
-        if(this.selectedTool == "Rect"){
+        if(this.selectedTool === "Rect"){
             const width = e.clientX - this.startX;
             const height = e.clientY - this.startY;
             shape = {
@@ -101,14 +104,17 @@ export class Game{
                 height,
                 width
             }
-        }else if(this.selectedTool == "Circle"){
-            const centerX = this.startX + e.clientX - this.startX / 2;
-            const centerY = this.startY + e.clientY - this.startY / 2;
+        }else if(this.selectedTool === "Circle"){
+            const width = e.clientX - this.startX;
+            const height = e.clientY - this.startY;
+            const radius = Math.max(width, height)/2;
+            // const centerX = this.startX + (e.clientX - this.startX / 2);
+            // const centerY = this.startY + (e.clientY - this.startY / 2);
             shape = {
                 type: this.selectedTool,
-                centerX,
-                centerY,
-                radius: Math.max(centerX, centerY) / 2
+                centerX: (this.startX + radius),
+                centerY: (this.startY + radius),
+                radius
             }
         }
         if (!shape)
@@ -122,7 +128,7 @@ export class Game{
             roomId: this.roomId
         }))
     }
-    mouseMoveHandler(e: any){
+    mouseMoveHandler = (e: any) => {
         if(this.clicked){
             const width = e.clientX - this.startX;
             const height = e.clientY - this.startY;
@@ -131,9 +137,9 @@ export class Game{
             if(this.selectedTool == "Rect"){
                 this.ctx?.strokeRect(this.startX, this.startY, width, height);
             }else if(this.selectedTool == "Circle"){
-                const centerX = this.startX + width/2;
-                const centerY = this.startY + height/2;
-                const radius = Math.max(width,height) / 2;
+                const radius = Math.max(width, height) / 2;
+                const centerX = this.startX + radius;
+                const centerY = this.startY + radius;
                 this.ctx?.beginPath()
                 this.ctx?.arc(centerX, centerY, Math.abs(radius), 0, Math.PI * 2);
                 this.ctx?.stroke();
@@ -143,8 +149,8 @@ export class Game{
     }
 
     initMouseHandlers(){
-        this.canvas.addEventListener("mousedown",this.mouseDownHandler)
-        this.canvas.addEventListener("mouseup",this.mouseUpHandler)
-        this.canvas.addEventListener("mousemove",this.mouseMoveHandler)
+        this.canvas.addEventListener("mousedown",this.mouseDownHandler);
+        this.canvas.addEventListener("mouseup",this.mouseUpHandler);
+        this.canvas.addEventListener("mousemove",this.mouseMoveHandler);
     }
 }
