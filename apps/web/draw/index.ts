@@ -53,6 +53,7 @@ export async function initDraw(canvas: HTMLCanvasElement, roomId: string, socket
         const width = e.clientX - startX;
         const height = e.clientY - startY;
         
+        
         const shape: shapes = {
             //@ts-ignore
             type: window.selectedTool,
@@ -82,6 +83,7 @@ export async function initDraw(canvas: HTMLCanvasElement, roomId: string, socket
             //@ts-ignore
             const selectedTool = window.selectedTool;
             if(selectedTool == "Rect"){
+                
                 ctx?.strokeRect(startX, startY, width, height);
             }else if(selectedTool == "Circle"){
                 const centerX = startX + width/2;

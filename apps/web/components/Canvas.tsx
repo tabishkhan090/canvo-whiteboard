@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { initDraw } from "../draw";
 import { IconButton } from "./iconBotton";
 import { Circle, Pencil, RectangleHorizontalIcon } from "lucide-react";
-import { Game } from "../draw/game";
+import { Game } from "../draw/draw";
+import { Game2 } from "../draw/game";
 
 type Shape = "Circle" | "Rect" | "Pencil"
 
@@ -13,21 +14,21 @@ export function Canvas({roomId, socket}: {roomId: string, socket: WebSocket}){
     const [game, setGame] = useState<Game>();
     
     
-    useEffect(()=>{
-        // //window is a global object provided by the browser. It is not part of React.
-        // //@ts-ignore
-        // window.selectedTool = selectedTool;
-        game?.setTool(selectedTool);
-    },[selectedTool, game])
+    // useEffect(()=>{
+    //     // //window is a global object provided by the browser. It is not part of React.
+    //     // //@ts-ignore
+    //     // window.selectedTool = selectedTool;
+    //     game?.setTool(selectedTool);
+    // },[selectedTool, game])
     
     useEffect(()=>{
         if(canvasRef.current){
-            const g = new Game(canvasRef.current, roomId, socket);
-            setGame(g);
+            const g = new Game2(canvasRef.current, roomId, socket);
+            // setGame(g);
 
-            return ()=>{
-                g.destroy();
-            }
+            // return ()=>{
+            //     g.destroy();
+            // }
         }
         // initDraw(canvasRef.current, roomId, socket);
     },[canvasRef])
