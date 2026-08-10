@@ -27,23 +27,21 @@ export type AggregateChat = {
 }
 
 export type ChatAvgAggregateOutputType = {
-  id: number | null
   roomId: number | null
 }
 
 export type ChatSumAggregateOutputType = {
-  id: number | null
   roomId: number | null
 }
 
 export type ChatMinAggregateOutputType = {
-  id: number | null
+  id: string | null
   roomId: number | null
   userId: string | null
 }
 
 export type ChatMaxAggregateOutputType = {
-  id: number | null
+  id: string | null
   roomId: number | null
   userId: string | null
 }
@@ -58,12 +56,10 @@ export type ChatCountAggregateOutputType = {
 
 
 export type ChatAvgAggregateInputType = {
-  id?: true
   roomId?: true
 }
 
 export type ChatSumAggregateInputType = {
-  id?: true
   roomId?: true
 }
 
@@ -174,7 +170,7 @@ export type ChatGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 }
 
 export type ChatGroupByOutputType = {
-  id: number
+  id: string
   roomId: number
   message: runtime.JsonValue
   userId: string
@@ -204,7 +200,7 @@ export type ChatWhereInput = {
   AND?: Prisma.ChatWhereInput | Prisma.ChatWhereInput[]
   OR?: Prisma.ChatWhereInput[]
   NOT?: Prisma.ChatWhereInput | Prisma.ChatWhereInput[]
-  id?: Prisma.IntFilter<"Chat"> | number
+  id?: Prisma.StringFilter<"Chat"> | string
   roomId?: Prisma.IntFilter<"Chat"> | number
   message?: Prisma.JsonFilter<"Chat">
   userId?: Prisma.StringFilter<"Chat"> | string
@@ -222,7 +218,7 @@ export type ChatOrderByWithRelationInput = {
 }
 
 export type ChatWhereUniqueInput = Prisma.AtLeast<{
-  id?: number
+  id?: string
   AND?: Prisma.ChatWhereInput | Prisma.ChatWhereInput[]
   OR?: Prisma.ChatWhereInput[]
   NOT?: Prisma.ChatWhereInput | Prisma.ChatWhereInput[]
@@ -249,51 +245,54 @@ export type ChatScalarWhereWithAggregatesInput = {
   AND?: Prisma.ChatScalarWhereWithAggregatesInput | Prisma.ChatScalarWhereWithAggregatesInput[]
   OR?: Prisma.ChatScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ChatScalarWhereWithAggregatesInput | Prisma.ChatScalarWhereWithAggregatesInput[]
-  id?: Prisma.IntWithAggregatesFilter<"Chat"> | number
+  id?: Prisma.StringWithAggregatesFilter<"Chat"> | string
   roomId?: Prisma.IntWithAggregatesFilter<"Chat"> | number
   message?: Prisma.JsonWithAggregatesFilter<"Chat">
   userId?: Prisma.StringWithAggregatesFilter<"Chat"> | string
 }
 
 export type ChatCreateInput = {
+  id?: string
   message: Prisma.JsonNullValueInput | runtime.InputJsonValue
   room: Prisma.RoomCreateNestedOneWithoutChatsInput
   user: Prisma.UserCreateNestedOneWithoutChatsInput
 }
 
 export type ChatUncheckedCreateInput = {
-  id?: number
+  id?: string
   roomId: number
   message: Prisma.JsonNullValueInput | runtime.InputJsonValue
   userId: string
 }
 
 export type ChatUpdateInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   room?: Prisma.RoomUpdateOneRequiredWithoutChatsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutChatsNestedInput
 }
 
 export type ChatUncheckedUpdateInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   roomId?: Prisma.IntFieldUpdateOperationsInput | number
   message?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ChatCreateManyInput = {
-  id?: number
+  id?: string
   roomId: number
   message: Prisma.JsonNullValueInput | runtime.InputJsonValue
   userId: string
 }
 
 export type ChatUpdateManyMutationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.JsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ChatUncheckedUpdateManyInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   roomId?: Prisma.IntFieldUpdateOperationsInput | number
   message?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -317,7 +316,6 @@ export type ChatCountOrderByAggregateInput = {
 }
 
 export type ChatAvgOrderByAggregateInput = {
-  id?: Prisma.SortOrder
   roomId?: Prisma.SortOrder
 }
 
@@ -334,7 +332,6 @@ export type ChatMinOrderByAggregateInput = {
 }
 
 export type ChatSumOrderByAggregateInput = {
-  id?: Prisma.SortOrder
   roomId?: Prisma.SortOrder
 }
 
@@ -423,12 +420,13 @@ export type ChatUncheckedUpdateManyWithoutRoomNestedInput = {
 }
 
 export type ChatCreateWithoutUserInput = {
+  id?: string
   message: Prisma.JsonNullValueInput | runtime.InputJsonValue
   room: Prisma.RoomCreateNestedOneWithoutChatsInput
 }
 
 export type ChatUncheckedCreateWithoutUserInput = {
-  id?: number
+  id?: string
   roomId: number
   message: Prisma.JsonNullValueInput | runtime.InputJsonValue
 }
@@ -463,19 +461,20 @@ export type ChatScalarWhereInput = {
   AND?: Prisma.ChatScalarWhereInput | Prisma.ChatScalarWhereInput[]
   OR?: Prisma.ChatScalarWhereInput[]
   NOT?: Prisma.ChatScalarWhereInput | Prisma.ChatScalarWhereInput[]
-  id?: Prisma.IntFilter<"Chat"> | number
+  id?: Prisma.StringFilter<"Chat"> | string
   roomId?: Prisma.IntFilter<"Chat"> | number
   message?: Prisma.JsonFilter<"Chat">
   userId?: Prisma.StringFilter<"Chat"> | string
 }
 
 export type ChatCreateWithoutRoomInput = {
+  id?: string
   message: Prisma.JsonNullValueInput | runtime.InputJsonValue
   user: Prisma.UserCreateNestedOneWithoutChatsInput
 }
 
 export type ChatUncheckedCreateWithoutRoomInput = {
-  id?: number
+  id?: string
   message: Prisma.JsonNullValueInput | runtime.InputJsonValue
   userId: string
 }
@@ -507,47 +506,49 @@ export type ChatUpdateManyWithWhereWithoutRoomInput = {
 }
 
 export type ChatCreateManyUserInput = {
-  id?: number
+  id?: string
   roomId: number
   message: Prisma.JsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ChatUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   room?: Prisma.RoomUpdateOneRequiredWithoutChatsNestedInput
 }
 
 export type ChatUncheckedUpdateWithoutUserInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   roomId?: Prisma.IntFieldUpdateOperationsInput | number
   message?: Prisma.JsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ChatUncheckedUpdateManyWithoutUserInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   roomId?: Prisma.IntFieldUpdateOperationsInput | number
   message?: Prisma.JsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ChatCreateManyRoomInput = {
-  id?: number
+  id?: string
   message: Prisma.JsonNullValueInput | runtime.InputJsonValue
   userId: string
 }
 
 export type ChatUpdateWithoutRoomInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   user?: Prisma.UserUpdateOneRequiredWithoutChatsNestedInput
 }
 
 export type ChatUncheckedUpdateWithoutRoomInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ChatUncheckedUpdateManyWithoutRoomInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -609,7 +610,7 @@ export type $ChatPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
-    id: number
+    id: string
     roomId: number
     message: runtime.JsonValue
     userId: string
@@ -1038,7 +1039,7 @@ export interface Prisma__ChatClient<T, Null = never, ExtArgs extends runtime.Typ
  * Fields of the Chat model
  */
 export interface ChatFieldRefs {
-  readonly id: Prisma.FieldRef<"Chat", 'Int'>
+  readonly id: Prisma.FieldRef<"Chat", 'String'>
   readonly roomId: Prisma.FieldRef<"Chat", 'Int'>
   readonly message: Prisma.FieldRef<"Chat", 'Json'>
   readonly userId: Prisma.FieldRef<"Chat", 'String'>

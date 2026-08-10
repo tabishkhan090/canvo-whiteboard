@@ -3,6 +3,7 @@ import { RectangleManager } from "./shapes/RectangleManager";
 import rough from "roughjs";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { Drawable } from "roughjs/bin/core";
+import { getExistingShapes } from "./http";
 
 type BoundingBox = {
     x: number;
@@ -57,8 +58,13 @@ export class Game2{
         )
         this.initMouseHandlers();
         this.initSocketHandler();
+        this.loadMessages();
     }
-
+    async loadMessages(){
+        this.messages = await getExistingShapes(this.roomId);
+        console.log(this.messages);
+        this.renderCanvas();
+    }
     mouseDownHandler = (e: MouseEvent) => {
         const rect = this.canvas.getBoundingClientRect();
         this.startX = e.clientX - rect.left;
@@ -96,7 +102,7 @@ export class Game2{
             this.rectangleManager.handleDrag(
                 this.selectedMessage,
                 dx,
-                dy
+                dy,
             )
             
             this.prevX = currentX;
@@ -123,10 +129,15 @@ export class Game2{
 
     mouseUpHandler = (e: MouseEvent) => {
         this.clicked = false;
+        if(this.isDragging){
+            this.selectedMessage = null;
+            this.isDragging = false;
+            return;
+        }
         const rect = this.canvas.getBoundingClientRect();
         const currentX = e.clientX - rect.left;
         const currentY = e.clientY - rect.top;
-
+        
         const w = currentX - this.startX;
         const h = currentY - this.startY;
         const message = this.rectangleManager.createMessage(
@@ -142,7 +153,7 @@ export class Game2{
             message,
             roomId: this.roomId
         }),
-        );
+    );
     }
 
     initMouseHandlers(){
