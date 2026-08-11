@@ -2,8 +2,8 @@ import { loadEnv } from "@repo/backend-common/loadEnv"
 loadEnv();
 import { getUserIdFromRequest } from "./helper"
 import { WebSocket, WebSocketServer } from "ws"
-import { WsMessageHandler } from "../wsMessageHandler";
-import { ConnectionManager } from "../connectionManager";
+import { WsMessageHandler } from "./wsMessageHandler";
+import { ConnectionManager } from "./connectionManager";
 
 
 const wss = new WebSocketServer({port: 8081},()=>{

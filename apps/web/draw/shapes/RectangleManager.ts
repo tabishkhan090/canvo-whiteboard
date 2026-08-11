@@ -3,6 +3,25 @@ import { Drawable } from "roughjs/bin/core";
 import { RoughGenerator } from "roughjs/bin/generator"
 import { Message } from "../game";
 
+const DEFAULT_RECT_STYLE = {
+    stroke: "#1e1e1e",          // Dark gray border
+    strokeWidth: 2,
+    fill: "transparent",        // No fill
+    fillStyle: "solid" as const,
+    fillWeight: 1,
+    roughness: 1.5,
+    bowing: 1,
+    strokeLineDash: [],
+    strokeLineDashOffset: 0,
+    strokeSharpness: "round" as const, // if supported by your RoughJS version
+    curveStepCount: 9,
+    curveFitting: 0.95,
+    disableMultiStroke: false,
+    disableMultiStrokeFill: false,
+    strokeOpacity: 100,
+    fillOpacity: 20,
+};
+
 type BoundingBox = { w: number, h: number, x: number, y: number }
 
 // Performance optimization constants
@@ -39,16 +58,7 @@ export class RectangleManager{
             y,
             w,
             h,
-            {
-                stroke: "#0c70fc",      // Border color
-                strokeWidth: 2,
-                fill: "transparent",    // No fill
-                fillStyle: "solid",     // Used when fill is not transparent
-                roughness: 2,
-                bowing: 1,
-                strokeLineDash: [],
-                fillWeight: 1,
-            }
+            DEFAULT_RECT_STYLE
         )
     }
     createMessage(

@@ -124,7 +124,6 @@ export class Game2{
             w,
             h
         );
-
     }
 
     mouseUpHandler = (e: MouseEvent) => {
@@ -149,7 +148,7 @@ export class Game2{
         this.messages.push(message);
         this.renderCanvas();
         this.socket.send(JSON.stringify({
-            type: "chat",
+            type: "create",
             message,
             roomId: this.roomId
         }),
@@ -178,11 +177,21 @@ export class Game2{
     initSocketHandler(){
         this.socket.onmessage = (event)=>{
         const data = JSON.parse(event.data);
-        if(data.type === "chat"){
-            const message: Message = data.message;
-            this.messages.push(message);
-            this.renderCanvas();
-        }
+            switch(data.type){
+                case "create":{
+                    const message: Message = data.message;
+                    this.messages.push(message);
+                    this.renderCanvas();
+                    break;
+                }
+                case "update":{
+
+                    break;
+                }
+                case "delete":{
+                    break;
+                }
+            }
         }
     }
 }
