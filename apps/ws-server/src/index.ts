@@ -6,7 +6,7 @@ import { WsMessageHandler } from "../wsMessageHandler";
 import { ConnectionManager } from "../connectionManager";
 
 
-const wss = new WebSocketServer({port: 8081},()=>{ //Here we are creating new webSocket server
+const wss = new WebSocketServer({port: 8081},()=>{
     console.log("port is running on: 8081")
 });
 const connectionManager = new ConnectionManager();
