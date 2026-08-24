@@ -22,9 +22,9 @@ export type Message = {
 export class Game2{
     private canvas: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
-    private socket: WebSocket;
     private rc: RoughCanvas;
     private generator: RoughGenerator;
+    private socket: WebSocket;
     private roomId: string;
     private messages: Message[] = [];
 
@@ -45,10 +45,10 @@ export class Game2{
         this.clicked = false;
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d")!;
-        this.socket = socket;
-        this.roomId= roomId;
         this.rc = rough.canvas(this.ctx.canvas);
         this.generator = rough.generator();
+        this.socket = socket;
+        this.roomId= roomId;
         this.rectangleManager = new RectangleManager(
             this.ctx,
             this.rc,

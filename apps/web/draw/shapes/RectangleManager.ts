@@ -130,7 +130,9 @@ export class RectangleManager{
         if(Date.now() - this.lastDragUpdate >= THROTTLE_MS){
             this.lastDragUpdate = Date.now();
             this.socket.send(JSON.stringify({
-                //send
+                type: "update",
+                roomId: this.roomId,
+                message: selectedMessage
             }))
         }
     }
