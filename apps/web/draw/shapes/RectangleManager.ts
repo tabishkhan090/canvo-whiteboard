@@ -74,12 +74,13 @@ export class RectangleManager{
             rect.w,
             rect.h
         )
-        return {
+        const message = {
             id: crypto.randomUUID(),
             shape: "rectangle",
             shapeData,
             boundingBox: rect
         }
+        return message as Message;
     }
 
     render(message: Message){

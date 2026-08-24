@@ -186,21 +186,26 @@ export class Game2{
                 }
                 case "update":{
                     const message: Message = data.message;
-                    const index = this.messages.findIndex(x=>{
-                        x.id === message.id;
-                    });
+                    const index = this.messages.findIndex( (x) =>
+                        x.id === message.id
+                    );
                     this.messages[index] = message;
                     this.renderCanvas();
                     break;
                 }
                 case "delete":{
-                    this.messages = this.messages.filter(x=>{
+                    this.messages = this.messages.filter( (x) =>
                         x.id !== data.id
-                    });
+                    );
                     this.renderCanvas();
                     break;
                 }
             }
         }
+    }
+    destroy(){
+        this.canvas.removeEventListener("mousedown",this.mouseDownHandler);
+        this.canvas.removeEventListener("mouseup",this.mouseUpHandler);
+        this.canvas.removeEventListener("mousemove",this.mouseMoveHandler);
     }
 }

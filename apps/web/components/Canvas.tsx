@@ -26,9 +26,9 @@ export function Canvas({roomId, socket}: {roomId: string, socket: WebSocket}){
             const g = new Game2(canvasRef.current, roomId, socket);
             // setGame(g);
 
-            // return ()=>{
-            //     g.destroy();
-            // }
+            return ()=>{
+                g.destroy();
+            }
         }
         // initDraw(canvasRef.current, roomId, socket);
     },[canvasRef])
