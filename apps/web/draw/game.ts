@@ -6,26 +6,57 @@ import { Drawable } from "roughjs/bin/core";
 import { getExistingShapes } from "./http";
 import { EllipseManager } from "./shapes/EllipseManager";
 
+export type Shape =
+    | "rectangle"
+    | "ellipse"
+    | "diamond"
+    | "line";
+
 export type BoundingBox = {
     x: number;
     y: number;
     w: number;
     h: number;
 };
-export type Shape =
-    | "rectangle"
-    | "ellipse"
-    | "line"
-    | "arrow"
-    | "diamond"
-    | "text";
 
-export type Message = {
+export type LineData = {
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+};
+
+type BaseMessage = {
     id: string;
-    shape: Shape;
     shapeData: Drawable;
+};
+
+export type RectangleMessage = BaseMessage & {
+    shape: "rectangle";
     boundingBox: BoundingBox;
 };
+
+export type EllipseMessage = BaseMessage & {
+    shape: "ellipse";
+    boundingBox: BoundingBox;
+};
+
+export type DiamondMessage = BaseMessage & {
+    shape: "diamond";
+    boundingBox: BoundingBox;
+};
+
+export type LineMessage = BaseMessage & {
+    shape: "line";
+    lineData: LineData;
+};
+
+export type Message =
+    | RectangleMessage
+    | EllipseMessage
+    | DiamondMessage
+    | LineMessage;
+
 
 export class Game2{
     private canvas: HTMLCanvasElement;

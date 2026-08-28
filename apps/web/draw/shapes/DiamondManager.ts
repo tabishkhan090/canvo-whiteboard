@@ -1,7 +1,7 @@
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
 import { RoughGenerator } from "roughjs/bin/generator";
-import { Message } from "../game";
+import { DiamondMessage, Message } from "../game";
 
 const DEFAULT_DIAMOND_STYLE = {
     stroke: "#1e1e1e",
@@ -120,11 +120,11 @@ export class DiamondManager {
     }
 
     hitTest(
-        msg: Message,
+        msg: DiamondMessage,
         nx: number,
         ny: number
     ): boolean {
-        const { x, y, w, h } = msg.boundingBox;
+        const { x, y, w, h } = msg.boundingBox!;
 
         return (
             nx >= x &&
@@ -134,7 +134,7 @@ export class DiamondManager {
         );
     }
 
-    handleDrag(selectedMessage: Message, dx: number, dy: number) {
+    handleDrag(selectedMessage: DiamondMessage, dx: number, dy: number) {
         const nx = selectedMessage.boundingBox.x + dx;
         const ny = selectedMessage.boundingBox.y + dy;
         const { w, h } = selectedMessage.boundingBox;

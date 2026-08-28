@@ -1,6 +1,6 @@
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughGenerator } from "roughjs/bin/generator";
-import { Message, BoundingBox } from "../game";
+import { Message, BoundingBox, EllipseMessage } from "../game";
 import { Drawable } from "roughjs/bin/core";
 
 const THROTTLE_MS = 33; 
@@ -77,7 +77,7 @@ export class EllipseManager{
         this.rc.draw(drawable);
     }
 
-    hitTest(msg: Message, px: number, py:number) :boolean {
+    hitTest(msg: EllipseMessage, px: number, py:number) :boolean {
         const { x, y, w, h } = msg.boundingBox;
 
         const cx = x + w / 2;
@@ -95,7 +95,7 @@ export class EllipseManager{
         );
     }
 
-    handleDrag(selectedMessage: Message, dx: number, dy: number){
+    handleDrag(selectedMessage: EllipseMessage, dx: number, dy: number){
         const nx = selectedMessage.boundingBox.x + dx;
         const ny = selectedMessage.boundingBox.y + dy;
 

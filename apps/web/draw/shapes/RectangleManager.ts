@@ -1,7 +1,7 @@
 import { RoughCanvas } from "roughjs/bin/canvas"
 import { Drawable } from "roughjs/bin/core";
 import { RoughGenerator } from "roughjs/bin/generator"
-import { Message } from "../game";
+import { Message, RectangleMessage } from "../game";
 
 const DEFAULT_RECT_STYLE = {
     stroke: "#1e1e1e",          // Dark gray border
@@ -97,12 +97,12 @@ export class RectangleManager{
             rect.w,
             rect.h
         );
-        
+
         this.rc.draw(drawable);
     }
 
     hitTest(
-        msg: Message,
+        msg: RectangleMessage,
         nx: number,
         ny: number
     ): boolean {
@@ -116,7 +116,7 @@ export class RectangleManager{
         );
     }
 
-    handleDrag(selectedMessage: Message, dx: number, dy: number){
+    handleDrag(selectedMessage: RectangleMessage, dx: number, dy: number){
         const nx = selectedMessage.boundingBox.x + dx;
         const ny = selectedMessage.boundingBox.y + dy;
         const {w, h} = selectedMessage.boundingBox;
