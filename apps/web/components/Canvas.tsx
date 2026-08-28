@@ -5,27 +5,24 @@ import { IconButton } from "./iconBotton";
 import { Circle, Pencil, RectangleHorizontalIcon } from "lucide-react";
 import { Game } from "../draw/draw";
 import { Game2 } from "../draw/game";
-
-type Shape = "Circle" | "Rect" | "Pencil"
+import { Shape } from "../draw/game";
 
 export function Canvas({roomId, socket}: {roomId: string, socket: WebSocket}){
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [selectedTool, setSelectedTool] = useState<Shape>("Circle");
-    const [game, setGame] = useState<Game>();
+    const [selectedTool, setSelectedTool] = useState<Shape>("rectangle");
+    const [game, setGame] = useState<Game2>();
     
-    
-    // useEffect(()=>{
-    //     // //window is a global object provided by the browser. It is not part of React.
-    //     // //@ts-ignore
-    //     // window.selectedTool = selectedTool;
-    //     game?.setTool(selectedTool);
-    // },[selectedTool, game])
+    useEffect(()=>{
+        // //window is a global object provided by the browser. It is not part of React.
+        // //@ts-ignore
+        // window.selectedTool = selectedTool;
+        game?.setCurrentShape(selectedTool);
+    },[selectedTool, game])
     
     useEffect(()=>{
         if(canvasRef.current){
             const g = new Game2(canvasRef.current, roomId, socket);
-            // setGame(g);
-
+            setGame(g);
             return ()=>{
                 g.destroy();
             }
@@ -54,9 +51,9 @@ function TopBar({
         left: 10,
     }}>
         <div className="flex">
-            <IconButton activated={selectedTool==="Pencil"} icon={<Pencil/>} onclick={() => {setSelectedTool("Pencil")}} />
-            <IconButton activated={selectedTool==="Circle"} icon={<Circle/>} onclick={() => {setSelectedTool("Circle")}} />
-            <IconButton activated={selectedTool==="Rect"} icon={<RectangleHorizontalIcon/>} onclick={() => {setSelectedTool("Rect")}} />
+            <IconButton activated={selectedTool==="line"} icon={<Pencil/>} onclick={() => {setSelectedTool("line")}} />
+            <IconButton activated={selectedTool==="ellipse"} icon={<Circle/>} onclick={() => {setSelectedTool("ellipse")}} />
+            <IconButton activated={selectedTool==="rectangle"} icon={<RectangleHorizontalIcon/>} onclick={() => {setSelectedTool("rectangle")}} />
         </div>
     </div>
 }

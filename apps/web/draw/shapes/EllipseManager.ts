@@ -1,43 +1,21 @@
-import { RoughCanvas } from "roughjs/bin/canvas"
+import { RoughCanvas } from "roughjs/bin/canvas";
+import { RoughGenerator } from "roughjs/bin/generator";
+import { Message, BoundingBox } from "../game";
 import { Drawable } from "roughjs/bin/core";
-import { RoughGenerator } from "roughjs/bin/generator"
-import { Message } from "../game";
 
-const DEFAULT_RECT_STYLE = {
-    stroke: "#1e1e1e",          // Dark gray border
-    strokeWidth: 2,
-    fill: "transparent",        // No fill
-    fillStyle: "solid" as const,
-    fillWeight: 1,
-    roughness: 1.5,
-    bowing: 1,
-    strokeLineDash: [],
-    strokeLineDashOffset: 0,
-    strokeSharpness: "round" as const, // if supported by your RoughJS version
-    curveStepCount: 9,
-    curveFitting: 0.95,
-    disableMultiStroke: false,
-    disableMultiStrokeFill: false,
-    strokeOpacity: 100,
-    fillOpacity: 20,
-};
+const THROTTLE_MS = 33; 
 
-// type BoundingBox = { w: number, h: number, x: number, y: number }
-
-// Performance optimization constants
-const THROTTLE_MS = 33; //ender throttle (~30fps)
-
-export class RectangleManager{
-    constructor( 
+export class EllipseManager{
+    constructor(
         private ctx: CanvasRenderingContext2D,
         private rc: RoughCanvas,
         private generator: RoughGenerator,
         private socket: WebSocket,
         private roomId: string,
         private lastDragUpdate: number = 0
-        ) {}
-    
-    private normalizeCoords(x: number, y: number, w: number, h: number){
+    ){}
+
+    private normalizeCoords(w: number, h: number, x: number, y: number){
         let nx = x;
         let ny = y;
         let nw = w;
@@ -50,37 +28,35 @@ export class RectangleManager{
             ny = y+h;
             nh = Math.abs(h);
         }
-        return {x: nx, y: ny, w: nw, h: nh};
+        return {x: nx, y: ny, w: nw, h: nh}
     }
     private createDrawable(x: number, y: number, w: number, h: number): Drawable{
-        return this.generator.rectangle(
-            x,
-            y,
+        return this.generator.ellipse(
+            x+w/2,
+            y+h/2,
             w,
-            h,
-            DEFAULT_RECT_STYLE
-        )
+            h
+        );
     }
     createMessage(
         startX: number,
         startY: number,
         w: number,
         h: number
-    ): Message {
-        const rect = this.normalizeCoords(startX, startY, w, h);
-        const shapeData: Drawable = this.createDrawable(
+    ) : Message{
+        const rect = this.normalizeCoords(w, h, startX, startY)
+        const shapeData = this.createDrawable(
             rect.x,
             rect.y,
             rect.w,
             rect.h
         )
-        const message = {
+        return {
             id: crypto.randomUUID(),
-            shape: "rectangle",
+            shape: "ellipse",
             shapeData,
             boundingBox: rect
         }
-        return message as Message;
     }
 
     render(message: Message){
@@ -101,37 +77,41 @@ export class RectangleManager{
         this.rc.draw(drawable);
     }
 
-    hitTest(
-        msg: Message,
-        nx: number,
-        ny: number
-    ): boolean {
+    hitTest(msg: Message, px: number, py:number) :boolean {
         const { x, y, w, h } = msg.boundingBox;
 
+        const cx = x + w / 2;
+        const cy = y + h / 2;
+
+        const rx = w / 2;
+        const ry = h / 2;
+
+        const dx = px - cx;
+        const dy = py - cy;
+
         return (
-            nx >= x &&
-            nx <= x + w &&
-            ny >= y &&
-            ny <= y + h
+            (dx * dx) / (rx * rx) +
+            (dy * dy) / (ry * ry) <= 1
         );
     }
 
     handleDrag(selectedMessage: Message, dx: number, dy: number){
         const nx = selectedMessage.boundingBox.x + dx;
         const ny = selectedMessage.boundingBox.y + dy;
-        const {w, h} = selectedMessage.boundingBox;
 
+        const {w, h} = selectedMessage.boundingBox;
         const newDrawable = this.createDrawable(nx, ny, w, h);
         selectedMessage.boundingBox = {
             ...selectedMessage.boundingBox,
             x: nx,
-            y: ny,
+            y: ny
         }
+
         selectedMessage.shapeData = newDrawable;
-        
-        // Throttle socket messages during drag operations
+
         if(Date.now() - this.lastDragUpdate >= THROTTLE_MS){
             this.lastDragUpdate = Date.now();
+
             this.socket.send(JSON.stringify({
                 type: "update",
                 roomId: this.roomId,

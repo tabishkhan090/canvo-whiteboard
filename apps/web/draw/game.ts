@@ -4,17 +4,25 @@ import rough from "roughjs";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { Drawable } from "roughjs/bin/core";
 import { getExistingShapes } from "./http";
+import { EllipseManager } from "./shapes/EllipseManager";
 
-type BoundingBox = {
+export type BoundingBox = {
     x: number;
     y: number;
     w: number;
     h: number;
 };
+export type Shape =
+    | "rectangle"
+    | "ellipse"
+    | "line"
+    | "arrow"
+    | "diamond"
+    | "text";
 
 export type Message = {
     id: string;
-    shape: "rectangle";
+    shape: Shape;
     shapeData: Drawable;
     boundingBox: BoundingBox;
 };
@@ -33,7 +41,9 @@ export class Game2{
     private clicked: boolean;
 
     private rectangleManager: RectangleManager;
+    private ellipseManager: EllipseManager;
 
+    private currentShape: Shape;
     private selectedMessage: Message | null=null;
     private isDragging = false;
     private prevX = 0;
@@ -47,8 +57,10 @@ export class Game2{
         this.ctx = canvas.getContext("2d")!;
         this.rc = rough.canvas(this.ctx.canvas);
         this.generator = rough.generator();
+        this.currentShape = "rectangle";
         this.socket = socket;
         this.roomId= roomId;
+        
         this.rectangleManager = new RectangleManager(
             this.ctx,
             this.rc,
@@ -56,9 +68,20 @@ export class Game2{
             this.socket,
             this.roomId
         )
+        this.ellipseManager = new EllipseManager(
+            this.ctx,
+            this.rc,
+            this.generator,
+            this.socket,
+            this.roomId
+        )
+
         this.initMouseHandlers();
         this.initSocketHandler();
         this.loadMessages();
+    }
+    setCurrentShape(shape: Shape){
+        this.currentShape = shape;
     }
     async loadMessages(){
         this.messages = await getExistingShapes(this.roomId);
@@ -70,24 +93,39 @@ export class Game2{
         this.startX = e.clientX - rect.left;
         this.startY = e.clientY - rect.top;
         
-        for(let i = this.messages.length-1; i>=0; i--){
-            const msg = this.messages[i];
-            if (!msg) continue;
-            if(
-                this.rectangleManager.hitTest(
+        for (let i = this.messages.length - 1; i >= 0; i--) {
+        const msg = this.messages[i];
+        if (!msg) continue;
+
+        let isHit = false;
+
+        switch (msg.shape) {
+            case "rectangle":
+                isHit = this.rectangleManager.hitTest(
                     msg,
                     this.startX,
                     this.startY
-                )
-            ){
-                this.prevX = this.startX;
-                this.prevY = this.startY;
-                this.selectedMessage = msg;
-                this.isDragging = true;
-                return;
-            }
+                );
+                break;
+
+            case "ellipse":
+                isHit = this.ellipseManager.hitTest(
+                    msg,
+                    this.startX,
+                    this.startY
+                );
+                break;
         }
-        this.clicked = true;
+
+        if (isHit) {
+            this.prevX = this.startX;
+            this.prevY = this.startY;
+            this.selectedMessage = msg;
+            this.isDragging = true;
+            return;
+        }
+    }
+    this.clicked = true;
     }
 
     mouseMoveHandler = (e: MouseEvent) => {
@@ -95,15 +133,25 @@ export class Game2{
         const currentX = e.clientX - rect.left;
         const currentY = e.clientY - rect.top;
         
-        
         if(this.isDragging && this.selectedMessage){
             const dx = currentX - this.prevX;
             const dy = currentY - this.prevY;
-            this.rectangleManager.handleDrag(
-                this.selectedMessage,
-                dx,
-                dy,
-            )
+            switch(this.selectedMessage.shape){
+                case "rectangle": 
+                    this.rectangleManager.handleDrag(
+                        this.selectedMessage,
+                        dx,
+                        dy,
+                    )
+                    break;
+                case "ellipse": 
+                    this.ellipseManager.handleDrag(
+                        this.selectedMessage,
+                        dx,
+                        dy,
+                    )
+                    break;
+            }
             
             this.prevX = currentX;
             this.prevY = currentY;
@@ -118,12 +166,27 @@ export class Game2{
         const h = currentY - this.startY;
         
         this.renderCanvas();
-        this.rectangleManager.renderPreview(
-            this.startX,
-            this.startY,
-            w,
-            h
-        );
+
+        switch(this.currentShape){
+            case "rectangle": {
+                this.rectangleManager.renderPreview(
+                this.startX,
+                this.startY,
+                w,
+                h
+                );
+                break;
+            }
+            case "ellipse": {
+                this.ellipseManager.renderPreview(
+                this.startX,
+                this.startY,
+                w,
+                h
+                );
+                break;
+            }
+        }
     }
 
     mouseUpHandler = (e: MouseEvent) => {
@@ -131,6 +194,8 @@ export class Game2{
         if(this.isDragging){
             this.selectedMessage = null;
             this.isDragging = false;
+            this.prevX = 0;
+            this.prevY = 0;
             return;
         }
         const rect = this.canvas.getBoundingClientRect();
@@ -139,13 +204,28 @@ export class Game2{
         
         const w = currentX - this.startX;
         const h = currentY - this.startY;
-        const message = this.rectangleManager.createMessage(
-            this.startX,
-            this.startY,
-            w,
-            h
-        );
-        this.messages.push(message);
+        let message = null;
+        switch(this.currentShape){
+            case "rectangle": {
+                    message = this.rectangleManager.createMessage(
+                    this.startX,
+                    this.startY,
+                    w,
+                    h
+                )
+                break;
+            }
+            case "ellipse": {
+                message = this.ellipseManager.createMessage(
+                    this.startX,
+                    this.startY,
+                    w,
+                    h
+                )
+                break;
+            }
+        }
+        this.messages.push(message as Message);
         this.renderCanvas();
         this.socket.send(JSON.stringify({
             type: "create",
@@ -170,7 +250,16 @@ export class Game2{
         )
 
         for( const m of this.messages){
-            this.rectangleManager.render(m);
+            switch(m.shape){
+                case "rectangle": {
+                    this.rectangleManager.render(m);
+                    break;
+                }
+                case "ellipse": {
+                    this.ellipseManager.render(m);
+                    break;
+                } 
+            }
         }
     }
 
