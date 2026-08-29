@@ -70,7 +70,7 @@ export class DiamondManager {
         );
     }
 
-    createMessage(
+    createMessage(  
         startX: number,
         startY: number,
         w: number,

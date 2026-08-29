@@ -66,12 +66,11 @@ export class EllipseManager{
     }
 
     renderPreview(startX: number, startY: number, w: number, h: number) {
-        const rect = this.normalizeCoords(startX, startY, w, h);
         const drawable = this.createDrawable(
-            rect.x,
-            rect.y,
-            rect.w,
-            rect.h
+            startX,
+            startY,
+            w,
+            h
         );
         
         this.rc.draw(drawable);
